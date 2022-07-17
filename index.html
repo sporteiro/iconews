@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="img/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link type="text/css" rel="stylesheet" href="estilo.css" />
+    <title>Iconoticias</title>
+    <meta name="Description" content="Toda la informacion de un vistazo" />
+    <script type="text/javascript" src="jquery.js"></script>
+    </head>
+    <body>
+	    <a href="/" class="main-title"><img src="img/iconoticias.png" alt="" height="40px" width="158px"/>&alpha;<i>lfa</i><br />  La información de un vistazo</a>
+	    <div class="second-title">
+        	<select onchange="main.change_country()" name="pais" id="select_country"></select>
+	    </div>
+	    <div class="titulares" id="titulares"></div>
+	    <div class="clear"></div>
+	    </div>
+	    <div class="clear"></div>
+	    <div class="final">
+	    DISE&Ntilde;O Y DESARROLLO DEL SITIO:<a href="http://www.sebastianporteiro.com.ar" target="_blank"> SEBASTIAN PORTEIRO <img src="/static/img/sp.png" alt="Sebastian Porteiro"/> </a>
+	    <br /><br /><img src="/static/img/googlenews32.png" alt="Google News"/> <img src="/static/img/cronica32.png" alt="Cronica"/>
+	    <img src="/static/img/clarin32.png" alt="Clarin"/> <img src="/static/img/elpais32.png" alt="El Pais"/> <img src="/static/img/lanacion32.png" alt="La Nacion"/> 
+	    <br />
+	    </div>
+	    <script type="text/javascript">
+	    function resize()	{
+		    var imagenes = document.getElementsByTagName("img");
+		    var w = window.innerWidth;
+		    var h = window.innerHeight;
+		    for (var i in imagenes)	{
+			    if (imagenes[i].width)	{
+				    imagenes[i].style.width="15%";
+			    }
+		    }
+	    }
+	    //resize();
+	    </script>
+        <script type="text/javascript" src="main.js"></script>
+    </body>
+</html>
