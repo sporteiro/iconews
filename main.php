@@ -5,13 +5,14 @@ Sebastian Porteiro 2022
 class Main {
     private $icon_path = "fontawesome";
     public $country;
-    public $country_list = ["Argentina"=>"https://news.google.com.ar/news/feeds?pz=1&cf=all&ned=es_ar&hl=es&output=rss",
-                            "Colombia"=>"http://news.google.com/news?cf=all&ned=es_co&hl=en&output=rss",
-                            "Cuba"=>"http://news.google.com.ar/news?cf=all&ned=es_cu&hl=es&output=rss",
-                            "Uruguay"=>"http://www.elobservador.com.uy/rss/nacional/",
-                            "Mexico"=>"http://news.google.com.mx/news?pz=1&cf=all&ned=es_mx&hl=es&output=rss",
-                            "Poland"=>"http://news.google.com/news?cf=all&ned=en_po&hl=en&output=rss",
-                            "Venezuela"=>"http://news.google.com.ar/news?cf=all&ned=es_ve&hl=es&output=rss"
+    public $country_list = ["Argentina"=>["rss"=>"https://news.google.com/rss/headlines/section/topic/NATION?hl=en-US&gl=AR&ceid=AR:en","short"=>"ar"],
+                            "Colombia"=>["rss"=>"https://news.google.com/rss/headlines/section/topic/NATION?hl=en-US&gl=CO&ceid=CO:en","short"=>"co"],
+                            "Cuba"=>["rss"=>"https://news.google.com/rss/headlines/section/topic/NATION?hl=en-US&gl=CU&ceid=CU:en","short"=>"cu"],
+                            "Mexico"=>["rss"=>"https://news.google.com/rss/headlines/section/topic/NATION?hl=en-US&gl=MXR&ceid=MX:en","short"=>"mx"],
+                            "Poland"=>["rss"=>"https://news.google.com/rss/headlines/section/topic/NATION?hl=en-US&gl=PL&ceid=PL:en","short"=>"pl"],
+                            "Spain"=>["rss"=>"https://news.google.com/rss/headlines/section/topic/NATION?hl=en-US&gl=ES&ceid=ES:en","short"=>"es"],
+                            "Venezuela"=>["rss"=>"https://news.google.com/rss/headlines/section/topic/NATION?hl=en-US&gl=VE&ceid=VE:en","short"=>"ve"],
+                            "Uruguay"=>["rss"=>"https://news.google.com/rss/headlines/section/topic/NATION?hl=en-US&gl=UY&ceid=UY:en","short"=>"uy"],
                            ];
 
    
@@ -28,7 +29,7 @@ class Main {
     	return json_encode($response);
     }
     function show_feed_from_country($country)   {
-        $url = $this->country_list[$country];
+        $url = $this->country_list[$country]['rss'];
         $feed = implode(file($url));
         $xml = simplexml_load_string($feed);
         return $xml;

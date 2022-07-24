@@ -5,24 +5,27 @@
     <link rel="shortcut icon" href="img/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link type="text/css" rel="stylesheet" href="estilo.css" />
-    <title>Iconoticias</title>
-    <meta name="Description" content="Toda la informacion de un vistazo" />
+    <link rel="stylesheet" type="text/css" href="dd.css" />
+    <link rel="stylesheet" type="text/css" href="flags.css" />
+
+    <title>IcoNews</title>
+    <meta name="Description" content="News at a glance" />
     <script type="text/javascript" src="jquery.js"></script>
     </head>
     <body>
-	    <a href="/" class="main-title"><img src="img/iconoticias.png" alt="" height="40px" width="158px"/>&alpha;<i>lfa</i><br />  La información de un vistazo</a>
+	    <a href="/" class="main-title"><img src="img/logo_white.png" alt="" height="40px" width="158px"/>&alpha;<i>lfa</i><br />  News at a glance</a>
 	    <div class="second-title">
-        	<select onchange="main.change_country()" name="pais" id="select_country"></select>
+        	<select name="select_country" id="select_country" is="ms-dropdown"></select>
 	    </div>
+        <div id="app_info">Debug</div>
 	    <div class="titulares" id="titulares"></div>
 	    <div class="clear"></div>
 	    </div>
 	    <div class="clear"></div>
 	    <div class="final">
-	    DISE&Ntilde;O Y DESARROLLO DEL SITIO:<a href="http://www.sebastianporteiro.com.ar" target="_blank"> SEBASTIAN PORTEIRO <img src="/static/img/sp.png" alt="Sebastian Porteiro"/> </a>
-	    <br /><br /><img src="/static/img/googlenews32.png" alt="Google News"/> <img src="/static/img/cronica32.png" alt="Cronica"/>
-	    <img src="/static/img/clarin32.png" alt="Clarin"/> <img src="/static/img/elpais32.png" alt="El Pais"/> <img src="/static/img/lanacion32.png" alt="La Nacion"/> 
+	    Made by:<a href="http://www.sebastianporteiro.com" target="_blank"> SEBASTIAN PORTEIRO <img src="img/sp.png" alt="Sebastian Porteiro"/> </a>
 	    <br />
+        <a href="https://fontawesome.com/" target="_blank"> Fontawesome <img src="img/font_awesome_logo.png" alt="fontawesome"/> </a>
 	    </div>
 	    <script type="text/javascript">
 	    function resize()	{
@@ -38,5 +41,6 @@
 	    //resize();
 	    </script>
         <script type="text/javascript" src="main.js"></script>
+        <script type="text/javascript" src="dd.min.js"></script>
     </body>
 </html>
