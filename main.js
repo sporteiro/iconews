@@ -2,8 +2,10 @@ class Main {
     constructor() {
         this.country_list;
         this.selected_country;
+        this.base_url;
     }
     init()  {
+        this.base_url = "http://localhost:8011/iconoticias/php/main.php";
         this.country_list = this.get_contries();
         this.selected_country = $( "#select_country option:selected" ).text();
         //prevents dropdown from multiple change, but also trigger only when the value is different
@@ -26,7 +28,7 @@ class Main {
     get_contries()  {
         $("#app_info").html("get_contries");
         var country_list;
-        var url = "http://localhost:8011/iconoticias/php/main.php?country_list=1";
+        var url = this.base_url+"?country_list=1";
         $.ajax({
             url: url,
             type: 'get',
@@ -45,6 +47,8 @@ class Main {
     make_country_select(country_list)   {
         $("#app_info").html("make_country_select");
         var countries = JSON.parse(country_list);
+        $("#select_country option[value='empty']").remove();
+
         $.each(countries, function (k,v) {
             var country = k;
             var option = '<option value="'+country+'" data-image="country-flags-main/svg/'+countries[k]['short']+'.svg">'+country+'</option>';
@@ -55,7 +59,7 @@ class Main {
         console.log("get_news_from_country",country);
         $("#app_info").html("get_news_from_country",country);
         var country_news;
-        var url = "http://localhost:8011/iconoticias/php/main.php?country="+country;
+        var url = this.base_url+"?country="+country;
         $.ajax({
             url: url,
             type: 'get',
@@ -102,7 +106,7 @@ class Main {
     }
     search_icons(word,id)  {
         $("#app_info").html("searching icons");
-        var url = "http://localhost:8011/iconoticias/php/main.php?icons";
+        var url = this.base_url+"?icons";
         var icon;
         $.ajax({
             url: url,

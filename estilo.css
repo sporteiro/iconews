@@ -2,6 +2,7 @@ body {
     margin: 0 auto;
     color: #333;
     background-color:rgb(58 47 149);
+    max-width:99%;
 }
 .main-title {
     display: block;
@@ -15,14 +16,16 @@ body {
     padding:1%;
 }
 .second-title {
-    margin: 0 auto;
-   background-color:#0B0B3B;
-   margin-bottom:0%;
-   text-align:right;
+  margin: 0 auto;
+  background-color:#0B0B3B;
+  margin-bottom:0%;
+  
+  /*text-align:right;*/
 }
 .titulares {
    padding-top:2%;
    padding-bottom:2%;
+   /*width: 100%;*(
    /*background-color:rgba(168, 174, 194, 0.63);*/
 }
 /*.noticia {
@@ -100,14 +103,16 @@ body {
    color:white;	
 }
 .final img	{
-    height:16px;
+    height:100px;
 }
-#select_country {
+.select_country {
   padding:1%;
   text-align: left;
-  font-size:1em;
+  font-size:2em;
 }
-
+.select_container {
+  float: right;
+}
 #app_info   {
     color: green;
     padding:2%;

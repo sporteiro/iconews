@@ -15,7 +15,12 @@
     <body>
 	    <a href="/" class="main-title"><img src="img/logo_white.png" alt="" height="40px" width="158px"/>&alpha;<i>lfa</i><br />  News at a glance</a>
 	    <div class="second-title">
-        	<select name="select_country" id="select_country" is="ms-dropdown"></select>
+	        <div class="select_container">
+            	<select name="select_country" id="select_country" is="ms-dropdown" class="select_country">
+            	    <option selected="selected" value="empty">Select country</option>
+            	</select>
+        	</div>
+		    <div class="clear"></div>
 	    </div>
         <div id="app_info">Debug</div>
 	    <div class="titulares" id="titulares"></div>
@@ -23,24 +28,11 @@
 	    </div>
 	    <div class="clear"></div>
 	    <div class="final">
-	    Made by:<a href="http://www.sebastianporteiro.com" target="_blank"> SEBASTIAN PORTEIRO <img src="img/sp.png" alt="Sebastian Porteiro"/> </a>
-	    <br />
-        <a href="https://fontawesome.com/" target="_blank"> Fontawesome <img src="img/font_awesome_logo.png" alt="fontawesome"/> </a>
+	        <a href="http://www.sebastianporteiro.com" target="_blank"><img src="img/sebastianporteiro_big.png" alt="Sebastian Porteiro"/></a> &nbsp;
+            <a href="https://fontawesome.com/" target="_blank"><img src="img/fontawesome_big.png" alt="fontawesome"/> </a> &nbsp;
+            <a href="https://news.google.com/" target="_blank"><img src="img/gnews.jpg" alt="Google News"/> </a> &nbsp;
 	    </div>
-	    <script type="text/javascript">
-	    function resize()	{
-		    var imagenes = document.getElementsByTagName("img");
-		    var w = window.innerWidth;
-		    var h = window.innerHeight;
-		    for (var i in imagenes)	{
-			    if (imagenes[i].width)	{
-				    imagenes[i].style.width="15%";
-			    }
-		    }
-	    }
-	    //resize();
-	    </script>
-        <script type="text/javascript" src="main.js"></script>
-        <script type="text/javascript" src="dd.min.js"></script>
     </body>
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="dd.min.js"></script>
 </html>
