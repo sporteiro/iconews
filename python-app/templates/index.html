@@ -6,14 +6,14 @@
     <title>IcoNews - news at a glance</title>
     <link rel="stylesheet" href="/estilo.css">
     <link rel="stylesheet" href="/dd.css">
-    <link rel="stylesheet" href="/flags.css">
     <script src="/jquery.js"></script>
-    <script src="/dd.min.js"></script>
 </head>
 <body>
     <div id="cabecera">
-        <img src="/img/logo_white.png" alt="IcoNews logo" id="logo" style="max-width: 200px; width: 100%; height: auto; display: block;">
-        <p class="tagline">news at a glance</p>
+        <div class="brand">
+            <img src="/img/logo_white.png" alt="IcoNews logo" id="logo" style="max-width: 200px; width: 100%; height: auto; display: block;">
+            <p class="tagline">news at a glance</p>
+        </div>
         <div class="country-selector">
             <label for="select_country">País:</label>
             <select id="select_country"></select>
@@ -26,15 +26,14 @@
 
     <footer>
         <p>
-            Icons by <a href="https://iconify.design" target="_blank" rel="noopener noreferrer">Iconify</a>.
-            News via Google News RSS.
+            IcoNews is made by <a href="https://sebastianporteiro.com" target="_blank" rel="noopener noreferrer">Sebastian Porteiro</a>.
+            <span id="current-year"></span>
         </p>
-        <p class="credits">IcoNews &copy; <span id="current-year"></span></p>
     </footer>
 
     <script src="/main.js"></script>
     <script>
-        document.getElementById('current-year').textContent = new Date().getFullYear();
+        document.getElementById('current-year').textContent = ' — ' + new Date().getFullYear();
     </script>
 </body>
 </html>
