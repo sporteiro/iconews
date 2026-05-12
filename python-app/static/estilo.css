@@ -109,19 +109,21 @@ body {
 }
 
 .mas {
-    display: inline-block;
-    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.6rem;
     background-color: #2563eb;
     color: white;
-    width: 28px;
-    height: 28px;
-    line-height: 26px;
-    text-align: center;
-    border-radius: 50%;
+    width: 42px;                /* más grande */
+    height: 42px;
+    font-size: 1.5rem;         /* "+" más grande */
     font-weight: bold;
+    border-radius: 50%;
     cursor: pointer;
     user-select: none;
     transition: background-color 0.2s;
+    line-height: 1;
 }
 
 .mas:hover {
@@ -130,22 +132,25 @@ body {
 
 .ampliado {
     margin-top: 0.75rem;
-    padding: 0.75rem;
-    background-color: #0f172a;
+    padding: 2rem;                     /* un poco más de padding */
+    background-color: #ffffff;
     border-radius: 6px;
     font-size: 0.85rem;
-    color: #cbd5e1;
+    color: #000000;
     border: 1px solid #334155;
+    word-wrap: break-word;             /* evita desbordamientos */
+    overflow-wrap: break-word;
 }
-
 /* Iconos dentro de las noticias */
 [id^="icons_"] img {
     vertical-align: middle;
-    margin-right: 4px;
-    margin-top: 4px;
-    height: 24px;
+    margin: 6px;
+    height: 64px;               /* antes 24px */
     width: auto;
-    border-radius: 2px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.92);  /* fondo blanco semitransparente */
+    padding: 4px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.3);  /* sutil borde para destacar */
 }
 
 /* Footer */
