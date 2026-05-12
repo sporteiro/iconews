@@ -2,6 +2,7 @@ from fastapi import FastAPI, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import feedparser
+import os
 
 app = FastAPI()
 
@@ -38,6 +39,13 @@ def get_news(cc: str = Query("ES")):
         return items
     except Exception as e:
         return {"error": str(e)}
+
+@app.get("/get-icon/{icon_name}")
+async def get_icon(icon_name: str):
+    local_png = f"static/img/{icon_name}.png"
+    if os.path.exists(local_png):
+        return {"source": "local", "url": f"/img/{icon_name}.png"}
+    return {"source": "remote", "query": icon_name}
 
 @app.get("/")
 def read_index():

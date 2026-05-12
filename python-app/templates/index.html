@@ -1,38 +1,40 @@
 <!DOCTYPE html>
-<html>
-    <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="shortcut icon" href="img/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link type="text/css" rel="stylesheet" href="estilo.css" />
-    <link rel="stylesheet" type="text/css" href="dd.css" />
-    <link rel="stylesheet" type="text/css" href="flags.css" />
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IcoNews - news at a glance</title>
+    <link rel="stylesheet" href="/estilo.css">
+    <link rel="stylesheet" href="/dd.css">
+    <link rel="stylesheet" href="/flags.css">
+    <script src="/jquery.js"></script>
+    <script src="/dd.min.js"></script>
+</head>
+<body>
+    <div id="cabecera">
+        <img src="/img/logo_white.png" alt="IcoNews logo" id="logo" style="max-width: 200px; width: 100%; height: auto; display: block;">
+        <p class="tagline">news at a glance</p>
+        <div class="country-selector">
+            <label for="select_country">País:</label>
+            <select id="select_country"></select>
+        </div>
+    </div>
 
-    <title>IcoNews</title>
-    <meta name="Description" content="News at a glance" />
-    <script type="text/javascript" src="jquery.js"></script>
-    </head>
-    <body>
-	    <a href="/" class="main-title"><img src="img/logo_white.png" alt="" height="40px" width="158px"/>&alpha;<i>lfa</i><br />  News at a glance</a>
-	    <div class="second-title">
-	        <div class="select_container">
-            	<select name="select_country" id="select_country" is="ms-dropdown" class="select_country">
-            	    <option selected="selected" value="empty">Select country</option>
-            	</select>
-        	</div>
-		    <div class="clear"></div>
-	    </div>
-        <div id="app_info">Debug</div>
-	    <div class="titulares" id="titulares"></div>
-	    <div class="clear"></div>
-	    </div>
-	    <div class="clear"></div>
-	    <div class="final">
-	        <a href="http://www.sebastianporteiro.com" target="_blank"><img src="img/sebastianporteiro_big.png" alt="Sebastian Porteiro"/></a> &nbsp;
-            <a href="https://fontawesome.com/" target="_blank"><img src="img/fontawesome_big.png" alt="fontawesome"/> </a> &nbsp;
-            <a href="https://news.google.com/" target="_blank"><img src="img/gnews.jpg" alt="Google News"/> </a> &nbsp;
-	    </div>
-    </body>
-    <script type="text/javascript" src="main.js"></script>
-    <script type="text/javascript" src="dd.min.js"></script>
+    <div id="titulares">
+        <p>Cargando noticias...</p>
+    </div>
+
+    <footer>
+        <p>
+            Icons by <a href="https://iconify.design" target="_blank" rel="noopener noreferrer">Iconify</a>.
+            News via Google News RSS.
+        </p>
+        <p class="credits">IcoNews &copy; <span id="current-year"></span></p>
+    </footer>
+
+    <script src="/main.js"></script>
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
 </html>
