@@ -118,4 +118,7 @@ body {
     padding:2%;
     background-color:black;
 }
-
+#logo {
+    max-width: 200px;
+    height: auto;
+}
