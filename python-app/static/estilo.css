@@ -245,3 +245,13 @@ footer a:hover {
     height: 20px;
     width: auto;
 }
+.ai-calculating {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 0.8rem;
+    color: #fbbf24;
+    font-style: italic;
+    background-color: rgba(0,0,0,0.5);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
