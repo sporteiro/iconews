@@ -2,13 +2,15 @@ class Main {
     constructor() {
         this.country_list = [];
         this.selected_country = null;
+        this.aiQueue = [];
+        this.aiProcessing = false;
+        this.currentAiRequest = null;
     }
 
     init() {
         this.get_countries();
         $("#app_info").hide();
 
-        // Close dropdown when clicking outside
         $(document).on('click', function(e) {
             if (!$(e.target).closest('.custom-dropdown').length) {
                 $('.custom-dropdown').removeClass('open');
@@ -33,16 +35,14 @@ class Main {
 
     build_custom_dropdown(countries) {
         var self = this;
-        var $selectContainer = $('#select_country').parent(); // El div.country-selector
+        var $selectContainer = $('#select_country').parent();
         var $select = $('#select_country');
-        $select.hide(); // Ocultamos el select nativo
+        $select.hide();
 
-        // Creamos el dropdown personalizado
         var $dropdown = $('<div class="custom-dropdown"></div>');
         var $trigger = $('<div class="custom-dropdown-trigger"></div>');
         var $list = $('<div class="custom-dropdown-list"></div>');
 
-        // Llenamos con los datos de países
         $.each(countries, function(i, country) {
             var flagPath = 'country-flags-main/svg/' + country.code.toLowerCase() + '.svg';
             var $item = $('<div class="custom-dropdown-item" data-value="' + country.code + '">' +
@@ -55,7 +55,6 @@ class Main {
                 if (value !== self.selected_country) {
                     self.selected_country = value;
                     self.get_news_from_country(value);
-                    // Actualizar el trigger
                     $trigger.html($(this).html());
                     $dropdown.removeClass('open');
                 }
@@ -63,7 +62,6 @@ class Main {
 
             $list.append($item);
 
-            // Seleccionar el primero por defecto
             if (i === 0) {
                 $trigger.html('<img src="' + flagPath + '" alt="' + country.name + '"><span>' + country.name + '</span>');
                 self.selected_country = country.code;
@@ -71,7 +69,6 @@ class Main {
             }
         });
 
-        // Evento toggle del dropdown
         $trigger.on('click', function(e) {
             e.stopPropagation();
             $(this).parent().toggleClass('open');
@@ -98,6 +95,15 @@ class Main {
 
     display_news(items) {
         $("#titulares").empty();
+
+        // Cancel any ongoing AI request and clear queue
+        if (this.currentAiRequest && this.currentAiRequest.readyState !== 4) {
+            this.currentAiRequest.abort();
+        }
+        this.currentAiRequest = null;
+        this.aiQueue = [];
+        this.aiProcessing = false;
+
         if (!items || items.length === 0) {
             $("#titulares").html("<p>No news found.</p>");
             return;
@@ -118,15 +124,62 @@ class Main {
             </div>`;
             $("#titulares").append(html);
 
-            let title_words = title.split(" ");
-            title_words.forEach(function (word) {
-                main.add_icon(word, i);
-            });
+            main.add_icons_from_words(title, i);
+            main.aiQueue.push({ title: title, news_id: i });
         });
 
         $('.ampliado').hide();
         $('.mas').off('click').on('click', function () {
             $(this).next('.ampliado').slideToggle('fast');
+        });
+
+        this.processNextAi();
+    }
+
+    processNextAi() {
+        if (this.aiQueue.length === 0 || this.aiProcessing) return;
+        this.aiProcessing = true;
+
+        var next = this.aiQueue.shift();
+        var self = this;
+
+        // Show status text
+        $('#icons_' + next.news_id).append('<span class="ai-calculating">enhancing icons...</span>');
+
+        this.currentAiRequest = $.getJSON('/ai-icons?title=' + encodeURIComponent(next.title))
+            .done(function(data) {
+                // Abort if the element no longer exists (country changed)
+                if ($('#icons_' + next.news_id).length === 0) return;
+                $('#icons_' + next.news_id + ' .ai-calculating').remove();
+
+                if (data.keywords && data.keywords.length > 0) {
+                    $('#icons_' + next.news_id).empty();
+                    $.each(data.keywords, function(idx, keyword) {
+                        self.add_icon(keyword, next.news_id);
+                    });
+                }
+            })
+            .fail(function(xhr, status) {
+                if (status === 'abort') return;
+                if ($('#icons_' + next.news_id).length === 0) return;
+                $('#icons_' + next.news_id + ' .ai-calculating').remove();
+            })
+            .always(function() {
+                if ($('#icons_' + next.news_id).length === 0) {
+                    self.aiProcessing = false;
+                    self.currentAiRequest = null;
+                    return;
+                }
+                self.aiProcessing = false;
+                self.currentAiRequest = null;
+                self.processNextAi();
+            });
+    }
+
+    add_icons_from_words(title, news_id) {
+        let title_words = title.split(" ");
+        title_words.forEach(function (word) {
+            main.add_icon(word, news_id);
         });
     }
 
@@ -152,12 +205,12 @@ class Main {
                 $.getJSON(`https://api.iconify.design/search?query=${data.query}&limit=1`, function (iconData) {
                     if (iconData.icons && iconData.icons.length > 0) {
                         let iconName = iconData.icons[0];
-                        let svgUrl = `https://api.iconify.design/${iconName}.svg?height=24`;
+                        let svgUrl = `https://api.iconify.design/${iconName}.svg?height=64`;
                         let img = $("<img>").attr({
                             src: svgUrl,
                             width: '10%',
                             alt: clean,
-                            title: `Icono para "${word}" vía Iconify`
+                            title: 'Icon via Iconify'
                         });
                         $("#icons_" + news_id).append(img);
                     }

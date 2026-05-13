@@ -1,10 +1,16 @@
+import os
 from fastapi import FastAPI, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import feedparser
-import os
+from openrouter_client import OpenRouterClient
 
 app = FastAPI()
+
+try:
+    ai_client = OpenRouterClient()
+except EnvironmentError:
+    ai_client = None
 
 COUNTRIES = [
     {"code": "ES", "name": "España"},
@@ -46,6 +52,13 @@ async def get_icon(icon_name: str):
     if os.path.exists(local_png):
         return {"source": "local", "url": f"/img/{icon_name}.png"}
     return {"source": "remote", "query": icon_name}
+
+@app.get("/ai-icons")
+async def ai_icons(title: str = Query(...)):
+    if not ai_client:
+        return {"keywords": []}
+    keywords = await ai_client.get_icon_keywords(title)
+    return {"keywords": keywords}
 
 @app.get("/")
 def read_index():
