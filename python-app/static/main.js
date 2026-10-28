@@ -2,9 +2,14 @@ class Main {
     constructor() {
         this.country_list = [];
         this.selected_country = null;
+        this.iconQueue = [];
+        this.iconProcessing = false;
         this.aiQueue = [];
         this.aiProcessing = false;
+        this.currentIconRequests = {};
         this.currentAiRequest = null;
+        this.newsTitles = {};
+        this.runId = 0;
     }
 
     init() {
@@ -94,22 +99,35 @@ class Main {
     }
 
     display_news(items) {
-        $("#titulares").empty();
+        var self = this;
 
-        // Cancel any ongoing AI request and clear queue
-        if (this.currentAiRequest && this.currentAiRequest.readyState !== 4) {
-            this.currentAiRequest.abort();
+        this.runId++;
+        var runId = this.runId;
+
+        if (this.currentAiRequest) {
+            try { this.currentAiRequest.abort(); } catch(e) {}
         }
         this.currentAiRequest = null;
+
+        for (let k in this.currentIconRequests) {
+            try { this.currentIconRequests[k].abort(); } catch(e) {}
+        }
+        this.currentIconRequests = {};
+
+        this.iconQueue = [];
+        this.iconProcessing = false;
         this.aiQueue = [];
         this.aiProcessing = false;
+        this.newsTitles = {};
+
+        $("#titulares").empty();
 
         if (!items || items.length === 0) {
             $("#titulares").html("<p>No news found.</p>");
             return;
         }
 
-        $.each(items, function (i, item) {
+        $.each(items, function(i, item) {
             let title = item.title;
             let description = item.description || "";
             let icon_container = "<span id='icons_" + i + "'></span>";
@@ -124,99 +142,188 @@ class Main {
             </div>`;
             $("#titulares").append(html);
 
-            main.add_icons_from_words(title, i);
-            main.aiQueue.push({ title: title, news_id: i });
+            self.newsTitles[i] = title;
+            self.iconQueue.push({ news_id: i });
         });
 
         $('.ampliado').hide();
-        $('.mas').off('click').on('click', function () {
+        $('.mas').off('click').on('click', function() {
             $(this).next('.ampliado').slideToggle('fast');
         });
 
-        this.processNextAi();
+        this.processNextIconNews(runId);
     }
 
-    processNextAi() {
-        if (this.aiQueue.length === 0 || this.aiProcessing) return;
-        this.aiProcessing = true;
-
-        var next = this.aiQueue.shift();
-        var self = this;
-
-        // Show status text
-        $('#icons_' + next.news_id).append('<span class="ai-calculating">enhancing icons...</span>');
-
-        this.currentAiRequest = $.getJSON('/ai-icons?title=' + encodeURIComponent(next.title))
-            .done(function(data) {
-                // Abort if the element no longer exists (country changed)
-                if ($('#icons_' + next.news_id).length === 0) return;
-                $('#icons_' + next.news_id + ' .ai-calculating').remove();
-
-                if (data.keywords && data.keywords.length > 0) {
-                    $('#icons_' + next.news_id).empty();
-                    $.each(data.keywords, function(idx, keyword) {
-                        self.add_icon(keyword, next.news_id);
-                    });
-                }
-            })
-            .fail(function(xhr, status) {
-                if (status === 'abort') return;
-                if ($('#icons_' + next.news_id).length === 0) return;
-                $('#icons_' + next.news_id + ' .ai-calculating').remove();
-            })
-            .always(function() {
-                if ($('#icons_' + next.news_id).length === 0) {
-                    self.aiProcessing = false;
-                    self.currentAiRequest = null;
-                    return;
-                }
-                self.aiProcessing = false;
-                self.currentAiRequest = null;
-                self.processNextAi();
-            });
-    }
-
-    add_icons_from_words(title, news_id) {
-        let title_words = title.split(" ");
-        title_words.forEach(function (word) {
-            main.add_icon(word, news_id);
-        });
-    }
-
-    add_icon(word, news_id) {
-        let clean = word
+    normalize_word(word) {
+        return word
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .replace(/ñ/g, "n")
             .replace(/Ñ/g, "N")
             .replace(/[^\w]/g, "");
+    }
 
-        if (clean.length === 0) return;
+    processNextIconNews(runId) {
+        if (runId !== this.runId) return;
+        if (this.iconQueue.length === 0 || this.iconProcessing) return;
+        this.iconProcessing = true;
 
-        $.getJSON(`/get-icon/${clean}`, function (data) {
-            if (data.source === 'local') {
-                let img = $("<img>").attr({
-                    src: data.url,
-                    width: '10%',
-                    alt: clean
-                });
-                $("#icons_" + news_id).append(img);
-            } else {
-                $.getJSON(`https://api.iconify.design/search?query=${data.query}&limit=1`, function (iconData) {
-                    if (iconData.icons && iconData.icons.length > 0) {
-                        let iconName = iconData.icons[0];
-                        let svgUrl = `https://api.iconify.design/${iconName}.svg?height=64`;
-                        let img = $("<img>").attr({
-                            src: svgUrl,
-                            width: '10%',
-                            alt: clean,
-                            title: 'Icon via Iconify'
-                        });
-                        $("#icons_" + news_id).append(img);
-                    }
-                });
+        var next = this.iconQueue.shift();
+        var self = this;
+        var news_id = next.news_id;
+        var title = this.newsTitles[news_id];
+
+        $('#icons_' + news_id).append('<span class="ai-calculating loading-icons">loading icons...</span>');
+
+        let words = title.split(" ");
+        let validWords = [];
+        for (let i = 0; i < words.length; i++) {
+            if (this.normalize_word(words[i]).length > 0) {
+                validWords.push(words[i]);
+            }
+        }
+
+        if (validWords.length === 0) {
+            this.finish_word_icons(news_id, runId);
+            return;
+        }
+
+        let pending = validWords.length;
+        let completed = 0;
+
+        $.each(validWords, function(idx, word) {
+            self.fetch_word_icon(word, news_id, runId, function() {
+                if (runId !== self.runId) return;
+                completed++;
+                if (completed >= pending) {
+                    self.finish_word_icons(news_id, runId);
+                }
+            });
+        });
+    }
+
+    finish_word_icons(news_id, runId) {
+        if (runId !== this.runId) return;
+        if ($('#icons_' + news_id).length === 0) return;
+
+        $('#icons_' + news_id + ' .loading-icons').remove();
+        this.iconProcessing = false;
+
+        this.aiQueue.push({ news_id: news_id });
+        this.processNextAi(runId);
+        this.processNextIconNews(runId);
+    }
+
+    fetch_word_icon(word, news_id, runId, onDone) {
+        var self = this;
+        let clean = this.normalize_word(word);
+
+        if (clean.length === 0) {
+            if (onDone) onDone();
+            return;
+        }
+
+        var requestKey = 'w_' + clean + '_' + news_id + '_' + Math.random().toString(36).substr(2, 9);
+
+        var request = $.ajax({
+            url: '/get-icon/' + encodeURIComponent(clean),
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                if (runId !== self.runId) return;
+                if ($('#icons_' + news_id).length === 0) return;
+                self.append_icon(data, clean, news_id);
+            },
+            complete: function() {
+                delete self.currentIconRequests[requestKey];
+                if (onDone) onDone();
             }
         });
+
+        this.currentIconRequests[requestKey] = request;
+    }
+
+    append_icon(data, clean, news_id) {
+        if (data.source === 'local' || data.source === 'cached') {
+            let img = $("<img>").attr({
+                src: data.url,
+                width: '10%',
+                alt: clean
+            });
+            $("#icons_" + news_id).append(img);
+        } else if (data.source === 'fontawesome') {
+            let icon = $("<i>").attr({
+                class: data.class,
+                style: 'font-size: 24px; margin-right: 8px;'
+            });
+            $("#icons_" + news_id).append(icon);
+        }
+    }
+
+    processNextAi(runId) {
+        if (runId !== this.runId) return;
+        if (this.aiQueue.length === 0 || this.aiProcessing) return;
+        this.aiProcessing = true;
+
+        var next = this.aiQueue.shift();
+        var self = this;
+        var news_id = next.news_id;
+        var title = this.newsTitles[news_id];
+
+        $('#icons_' + news_id).append('<span class="ai-calculating enhancing-icons">enhancing icons...</span>');
+
+        this.currentAiRequest = $.ajax({
+            url: '/ai-icons?title=' + encodeURIComponent(title),
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                if (runId !== self.runId) return;
+                if ($('#icons_' + news_id).length === 0) {
+                    self.finish_ai(news_id, runId);
+                    return;
+                }
+
+                $('#icons_' + news_id + ' .enhancing-icons').remove();
+
+                let keywords = (data.keywords || []).filter(function(k) {
+                    return self.normalize_word(k).length > 0;
+                });
+
+                if (keywords.length > 0) {
+                    $('#icons_' + news_id).append('<span class="ai-calculating loading-enhanced">loading enhanced icons...</span>');
+                    $('#icons_' + news_id).children('img, i').remove();
+
+                    let pending = keywords.length;
+                    let completed = 0;
+
+                    $.each(keywords, function(idx, keyword) {
+                        self.fetch_word_icon(keyword, news_id, runId, function() {
+                            if (runId !== self.runId) return;
+                            completed++;
+                            if (completed >= pending) {
+                                $('#icons_' + news_id + ' .loading-enhanced').remove();
+                                self.finish_ai(news_id, runId);
+                            }
+                        });
+                    });
+                } else {
+                    self.finish_ai(news_id, runId);
+                }
+            },
+            error: function(xhr, status) {
+                if (status === 'abort') return;
+                if (runId !== self.runId) return;
+                $('#icons_' + news_id + ' .enhancing-icons').remove();
+                self.finish_ai(news_id, runId);
+            }
+        });
+    }
+
+    finish_ai(news_id, runId) {
+        if (runId !== this.runId) return;
+        this.aiProcessing = false;
+        this.currentAiRequest = null;
+        this.processNextAi(runId);
     }
 }
 
